@@ -1,0 +1,282 @@
+{% extends 'base.html' %}
+
+{% block head %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'chat/home.css' %}" type="text/css">
+<script src="{% static 'jquery-3.3.1.js' %}" charset="utf-8"></script>
+<script type="text/javascript">
+window.onload = function() {
+
+  loadConversationsList();
+
+}
+
+
+
+
+</script>
+
+{% endblock %}
+{% block body %}
+  <div class="row">
+    <div class="left col-md-lg-2">
+      <div class="search-friend-div">
+        <form method="post" id="find_user_form">
+          {% csrf_token %}
+          {{ find_user_form.user }}
+           <input type="hidden" name="type" value="find_user_form" id="form_type">
+        </form>
+      </div>
+      <div class="results-div" id=results-div-id>
+          ^^^
+          Dodaj Znajomych
+      </div>
+    </div>
+    <div class="right col">
+      <div class="chat-top" id="chat-top-div">
+        Chat Name
+      </div>
+      <div class="chat" id="chatDiv">
+        Otwórz Chat
+      </div>
+      <div class="chat-bottom">
+        <div class="ChatLeft">
+          <textarea name="ChatInField" cols="40" rows="5" class="form-control" id="ChatInField"></textarea>
+          <input type="hidden" name="conv_name" value="" id="conv_name">
+      </div>
+      <div class="ChatRight">
+        <button type="button" name="Send" id="sendButton" class="btn btn-primary" onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block bottom %}
+
+  <script type="text/javascript">
+  $(document).on('submit', '#find_user_form', function(e) {
+     e.preventDefault();
+     //console.log("aaa");
+    //alert('aas');
+  postFindFriends();
+  });
+
+  var find_user_form_input = document.querySelector(".find_user_form");
+  var find_user_form = document.querySelector("#find_user_form");
+  var search_result_div = document.querySelector(".search_result");
+  var add_user_form = document.querySelector(".add_user_form")
+  find_user_form_input.addEventListener("keyup", autoSubmitForm, true);
+  find_user_form_input.addEventListener("focusout", loadConversationsList, true)
+  //search_result_div.addEventListener("click", addFiend(), true);
+
+  document.querySelector('#ChatInField').addEventListener('keypress', function (e) {
+      var key = e.which || e.keyCode;
+      if (key === 13) { // 13 is enter
+        sendMessage();
+      }
+  });
+
+  $.ajaxSetup({
+      beforeSend: function(xhr, settings) {
+          if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+              xhr.setRequestHeader("X-CSRFToken", csrftoken);
+          }
+      }
+  });
+var csrftoken = getCookie('csrftoken');
+
+  function postFindFriends() {
+    $.ajax({
+      type:'POST',
+      url:'/chat/',
+      data:{
+        user:$('.find_user_form').val(),
+        type:$('#form_type').val(),
+        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+      },
+      success:function(response){
+        var response = JSON.parse(response);
+          //alert(response);
+          var odp="";
+          for (let user of response.users){
+           odp += (`
+            <div class="search_result" onclick=addFiend("${user.username}")>${user.first_name} ${user.last_name}
+           <div class="search_result_username">@${user.username}
+           </div>
+           </div>
+           `);
+          }
+          document.getElementById('results-div-id').innerHTML = odp;
+      }
+    });
+  }
+    function getCookie(name) {
+      var cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          var cookies = document.cookie.split(';');
+          for (var i = 0; i < cookies.length; i++) {
+              var cookie = jQuery.trim(cookies[i]);
+              // Does this cookie string begin with the name we want?
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue;
+    }
+
+  function autoSubmitForm() {
+    var find_user_form_input = document.querySelector(".find_user_form");
+    var find_user_form = document.querySelector("#find_user_form");
+    //alert(find_user_form_input.value)
+    if(find_user_form_input.value != ""){
+      postFindFriends();
+    }
+  }
+  function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+
+  function addFiend(username){
+
+    $.ajax({
+      type:'POST',
+      url:'/chat/',
+      csrfmiddlewaretoken: getCookie('csrftoken'),
+      data:{
+        user: username,
+        type:'add_user',
+      },
+      success:function(response){
+        alert(response);
+        var response = JSON.parse(response);
+          //alert(response);
+
+      }
+    });
+    loadConversationsList();
+  }
+  function loadConversationsList(){
+    $.ajax({
+      type:'POST',
+      url:'/chat/',
+      csrfmiddlewaretoken: getCookie('csrftoken'),
+      data:{
+        type:'load_conversations',
+      },
+      success:function(response){
+        //alert(response);
+        var response = JSON.parse(response);
+          //alert(response);
+          var odp="";
+          for (let conv of response.conversations){
+           odp += (`
+            <div class="conversation_found" onclick=openChat("${conv.id}")>${conv.name}
+           <div class="conversation_found_message">${conv.lastMsg}
+           </div>
+           </div>
+           `);
+          }
+
+          document.getElementById('results-div-id').innerHTML = odp;
+      }
+    });
+  }
+var conversationName="";
+var currentChatInner="";
+  function openChat(conv) {
+    if(conv !=""){
+    $.ajax({
+      type:'POST',
+      url:'/chat/',
+      csrfmiddlewaretoken: getCookie('csrftoken'),
+      data:{
+        type: 'load_chat',
+        conv: conv,
+      },
+
+      success:function(response){
+        conversationName=conv;
+        document.getElementById('conv_name').value = conv;
+        //alert(response);
+        var response = JSON.parse(response);
+          //alert(response);
+          var odp="";
+          document.getElementById('chat-top-div').innerHTML = response.name;
+          for (let msg of response.messages){
+            if (msg.user == response.user){
+              //alert(odp);
+              odp = odp+(`
+              <div class ="message-con">
+               <div class="message  my-message">${msg.message}
+              <div class="message-bottom">Sent by You at  ${msg.sent_time}
+              </div>
+              </div>
+              </div>
+              `);
+            }else {
+
+           odp = odp+(`
+             <div class ="message-con">
+             <div class="message">${msg.message}
+            <div class="message-bottom">Sent by ${msg.user} at ${msg.sent_time}
+            </div>
+            </div>
+            </div>
+           `);
+         }
+       }if(odp !== currentChatInner){
+           document.getElementById('chatDiv').innerHTML = odp;
+           currentChatInner=odp;
+           var objDiv = document.getElementById("chatDiv");
+           objDiv.scrollTop = objDiv.scrollHeight;
+         }
+
+       }
+         });
+}
+     }
+
+       var interval = setInterval(function(){ openChat(conversationName); }, 3000);
+
+
+  function sendMessage() {
+    var msg = document.getElementById('ChatInField').value;
+    var conv = document.getElementById('conv_name').value;
+    document.getElementById('ChatInField').value='';
+    //alert(conv)
+    $.ajax({
+      type:'POST',
+      url:'/chat/',
+      csrfmiddlewaretoken: getCookie('csrftoken'),
+      data:{
+        type:'send_message',
+        message: msg,
+        conversation: conv,
+      },
+      success:function(response){
+        //alert(response);
+        openChat(conv);
+
+      /*  var response = JSON.parse(response);
+          //alert(response);
+          var odp="";
+          for (let conv of response.conversations){
+           odp += (`
+            <div class="conversation_found" onclick=openChat("${conv.id}")>${conv.name}
+           <div class="conversation_found_message">${conv.lastMsg}
+           </div>
+           </div>
+           `);
+         }*/
+
+          //document.getElementById('results-div-id').innerHTML = odp;
+      }
+    });
+  }
+
+  </script>
+
+{% endblock %}
