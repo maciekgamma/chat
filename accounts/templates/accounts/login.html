@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block head %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'accounts/login.css' %}" type="text/css">
+
+
+{% endblock %}
+{% block body %}
+<div class="container">
+  <div class="login-div">
+    <div class="logo text-center">
+      <span style="color:red">G</span>amnet
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+      {{ form.username }}
+      <br>
+      {{ form.password }}
+      <div class="text-center">
+
+
+        <button type="submit" name="login-button" class="btn btn-primary" >Login</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,136 @@
+.login-div{
+width: 450px;
+margin-left: auto;
+margin-right: auto;
+margin-top: 5%;
+background-color: #00796b;
+padding-top: 25px;
+padding-left: 30px;
+padding-right: 30px;
+padding-bottom: 70px;
+border-radius: 15px;
+}
+.container{
+  margin: 0 !important;
+  height: 92%;
+  width: 100% !important;
+  display:block;
+  position:absolute;
+}
+.left{
+  width: 25%;
+  background-color: #e6e6e6 !important;
+  height: 100%;
+  border-right:  1px solid black;
+}
+.find_user_form{
+
+}
+.right{
+  width: 75%;
+  height: 100%;
+  position:relative;
+}
+.row{
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  position: relative;
+}
+body{
+  margin: 0;
+  height: 100%;
+  display: block;
+}
+html{
+  height: 100%;
+}
+.navbar{
+  margin-bottom: 0px !important;
+}
+.search_result{
+  padding-top: 10px ;
+  padding-left: 5px;
+  font-size:1.25em;
+  background-color:#38b7a9;
+  border: 1px solid black;
+}
+.search_result_username{
+  font-size: 1em;
+  color: grey;
+  font-style: italic;
+}
+.conversation_found{
+  padding-top: 10px ;
+  padding-left: 5px;
+  font-size:1.25em;
+  background-color:#38b7a9;
+  border: 1px solid black;
+  border-radius: 10px;
+  margin-left: 5px;
+  margin-right: 5px;
+  margin-top: 5px;
+}
+.chat-top{
+  width: 100%;
+  text-align: center;
+  font-size: 2em;
+  padding-top: 10px;
+  height:8%;
+  background-color:#00796b;
+  color:white;
+}
+.find_user_form{
+  margin-left: 5px;
+  margin-right: 5px;
+}
+.chat-bottom{
+  bottom: 0;
+  height: 20%;
+  width: 100%;
+  background-color:#e6e6e6 ;
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+}
+#ChatInField{
+  width: 95%;
+  margin-top: 5px;
+  margin-left: 5px;
+  height:80%;
+  resize: none;
+}
+.ChatLeft{
+  width: 80%;
+}
+.ChatRight{
+  width: 20%;
+}
+.message{
+  background-color: #00796b;
+  margin-top: 10px;
+  display: inline-block;
+  color: white;
+  font-size: 1.2em;
+  border-radius: 10px;
+  margin: 2px;
+  width: auto;
+  padding: 4px;
+}
+.message-bottom{
+  font-size: 0.9em;
+  font-style: italic;
+}
+.my-message{
+  right: 1px;
+  background-color: #38b7a9
+}
+.chat{
+  position: relative;
+  overflow-y:scroll;
+  height: 72%
+}
+.message-con{
+  max-width: 50%;
+  display: block;
+}
